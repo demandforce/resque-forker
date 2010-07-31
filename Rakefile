@@ -1,4 +1,4 @@
-spec = Gem::Specification.load(File.expand_path("vanity.gemspec", File.dirname(__FILE__)))
+spec = Gem::Specification.load(File.expand_path("resque-forker.gemspec", File.dirname(__FILE__)))
 
 desc "Build the Gem"
 task :build do
@@ -12,7 +12,7 @@ task :install=>:build do
 end
 
 desc "Push new release to gemcutter and git tag"
-task :push=>["test:rubies", "build"] do
+task :push=>["build"] do
   sh "git push"
   puts "Tagging version #{spec.version} .."
   sh "git tag v#{spec.version}"
