@@ -1,0 +1,163 @@
+= Resque::Forker
+
+Super awesome forking action for Resque workers.
+
+== Forking Workers
+
+If you're like us, you have a sizeable application with many models, libraries
+and dependencies that are shared between the front-facing UI and the back-end
+processing. And like us, you're Resque worker are loading the entire application
+each time the fire up.
+
+If you're running 8 workers that can be quite the CPU-churning delay loading
+them all up. Exactly the problem we're going to solve by starting the
+application once and then forking it. Forking all these workers takes
+milliseconds. Faster restart means faster deploy and less downtime. Yay!
+
+
+== Creating the script
+
+We're going to create a Ruby script that loads the applications, handles
+connections, and decides what kind of workload (how many workers on which
+queues) to process.
+
+Edit this to your needs and place it in script/workers:
+
+  #!/usr/bin/env ruby
+  require "resque/forker"
+
+  # Load the application.
+  Resque.setup do |forker|
+    require File.dirname(__FILE__) + "/../config/environment"
+    ActiveRecord::Base.connection.disconnect!
+    if Rails.env.production?
+      forker.logger = Rails.logger
+      forker.workload = ["*"] * 4        # 4 workers on all queues
+      forker.user "www-data", "www-data" # don't run as root
+    end
+  end
+  # Stuff to do after forking a worker.
+  Resque.after_fork do
+    ActiveRecord::Base.establish_connection
+  end
+  Resque.fork!
+
+You can now run workers from the command line:
+
+  $ ruby script/workers
+
+In development mode you will get one worker that outputs to the console. In
+production you get four workers that log messages to the Rails logger and run
+under the www-data account (never run as root).
+
+Worker processes can't share connections with each other, so we're closing the
+database connection from the master process and then establishing new connection
+for each individual worker. You'll have to do the same with other libraries that
+maintain open connections (MongoMapper, Vanity, etc)
+
+You tell Resque::Forker what workload to process using an array of queue lists.
+Each array element represents one worker, so 4 elements would start up four
+workers. The element's value tell the worker which queues to process. For
+example, if you want four workers processing the import queue, and two of these
+workers also processing the export queue:
+
+  forker.workload = ["import", "import,export"] * 2
+
+
+== Controlling the Workers
+
+You can use these signals to control individual workers, or send them to the
+master process, which will propagate them to all workers:
+
+  kill -QUIT -- Quit gracefully
+  kill -TERM -- Terminate immediately
+  kill -USR1 -- Stop any ongoing job
+  kill -USR2 -- Suspend worker
+  kill -CONT -- Resume suspended worker
+
+After deploying you want to stop all  workers, reload the master process (and
+the application and its configuration) and have all workers restarted. Simply
+send it the HUP signal. That easy.
+
+You probably want to suspend/resume (USR2/CONT signals) if you're doing any
+maintenance work that may disrupt the workers, like rake db:migrate. Of course
+you can stop/start the master process, but what would be the fun of that.
+
+Of course, you want the workers to start after reboot and each way to control
+them. Read on how to use Resque::Forker with Upstart.
+
+
+== Using Upstart and Capistrano
+
+If you're running a recent release of Ubuntu, you can get Upstart to manage your
+workers.
+
+Edit this to your needs and place it in /etc/init/workers:
+
+  start on runlevel [2345]
+  stop on runlevel [06]
+  chdir /var/www/myapp/current
+  env RAILS_ENV=production
+  exec script/workers
+  respawn
+
+After reading this, Upstart to make sure your workers are always up and running.
+It's awesome like that.
+
+To start, stop, check status and reload:
+
+  $ start workers
+  $ stop workers
+  $ status workers
+  $ reload workers
+
+You need to be root to start/stop the workers. However, if you change ownership
+of the workers (see fork.user above) you can reload them as that user. You can
+do something like this in your Capfile:
+
+  namespace :workers do
+    task :pause do
+      run "status workers | cut -d ' ' -f 4 | xargs kill -USR2"
+    end
+    task :resume do
+      run "status workers | cut -d ' ' -f 4 | xargs kill -CONT"
+    end
+    task :reload do
+      run "reload workers"
+    end
+  end
+  after "deploy:update_code", "workers:reload"
+
+Because of the way Upstart works, there is no need for PID file or running as
+daemon. Yay for sane process supervisors! When you reload workers,
+Resque::Forker reloads itself (and the application) while keeping the same PID.
+
+
+== Troubleshooting
+ 
+If you're using Bundler, you might need to run the script using: 
+
+  exec bundle exec script/workers
+
+If you're using RVM and Bundler, you might need to create a wrapper and use it:
+
+  exec run_bundle script/workers
+
+The point is, when the script starts it will expect both resque and
+resque-forker must be available for loading (that typically means GEMPATH).
+Depending on your setup, they may be loaded by Bundler, available in the RVM
+gemset, installed as system gems, etc.
+
+If you're hitting a wall, remember that any settings and aliases that you have
+in .bashrc (RVM, for example, or the path to bundle) are not sourced by Upstart,
+so commands that "just work" when you run from the console will fail.
+
+What you can do to troubleshoot this situation is run as root in a new shell
+that doesn't have your regular account settings:
+
+  $ env -i sudo /bin/bash --norc --noprofile
+
+
+== Credits
+
+Copyright (c) 2010 Flowtown, Inc.
