@@ -14,8 +14,9 @@ module Resque
   #     ActiveRecord::Base.connection.disconnect!
   #     forker.logger = Rails.logger
   #     forker.user "nobody", "nobody"
+  #     forker.workload = ["*"] * 8
   #   end
-  #   Resque.after_fork do
+  #   Resque.before_first_fork do
   #     ActiveRecord::Base.establish_connection
   #   end
   #
@@ -27,14 +28,14 @@ module Resque
   #
   # All the forking action is handled by a single call:
   #   # Three workers, processing all queues
-  #   Resque.fork! ["*"] * 3
+  #   Resque.fork! :workload=>["*"] * 3
   #
   # The workload is specified as an array of lists of queues, that way you can
   # decide how many workers to fork (length of the array) and give each worker
   # different set of queues to work with. For example, to have four workers
   # processing import queue, and only two of these also processing export queue:
   #
-  #   Resque.fork! ["import,export", "import"] * 2
+  #   forker.workload = ["import,export", "import"] * 2
   #
   # Once the process is up and running, you control it by sending signals:
   # - kill -QUIT -- Quit gracefully
@@ -59,9 +60,9 @@ module Resque
   #   respawn
   class Forker
     def initialize(options = nil)
-      @options = options || {}
-      @logger = @options[:logger] || Logger.new($stderr)
-      @workload = ["*"]
+      @options = options ? options.clone : {}
+      @logger = options.delete(:logger) || Logger.new($stderr)
+      @workload = options.delete(:workload) || ["*"]
       @children = []
       begin
         require "system_timer"
@@ -78,6 +79,9 @@ module Resque
 
     # Defaults to stderr, but you may want to point this at Rails logger.
     attr_accessor :logger
+
+    # Most options can be changed from the Resque.setup hook.
+    attr_reader :options
 
     # Run and never return.
     def run
@@ -149,9 +153,9 @@ module Resque
     # Run and never return.
     def run_worker(queues)
       worker = Resque::Worker.new(*queues.split(","))
-      worker.verbose = $VERBOSE
-      worker.very_verbose = $DEBUG
-      worker.work(@options[:interval] || 5) # interval, will block
+      worker.verbose = options[:verbose]
+      worker.very_verbose = options[:very_verbose]
+      worker.work(options[:interval] || 5) # interval, will block
     end
 
     # Stop child processes and run any teardown action.
@@ -166,7 +170,7 @@ module Resque
       end
       reap_children
       if teardown = Resque.teardown
-        @timeout.call @options[:terminate] || 5 do
+        @timeout.call options[:terminate] || 5 do
           begin
             teardown.call self
           rescue Exception
@@ -224,9 +228,12 @@ module Resque
   # - :logger -- Which Logger to use (default logger to stdout)
   # - :interval -- Processing interval (default to 5 seconds)
   # - :terminate -- Timeout running teardown block (default to 5 seconds)
-  def fork!(workload = nil, options = nil)
-    forker = Resque::Forker.new(options)
-    forker.workload = workload if workload
-    forker.run
+  # - :verbose -- Be verbose.
+  # - :very_verbose -- Make :verbose look quiet.
+  # - :workload -- The initial workload.
+  #
+  # You can also set these options from the Resque.setup hook.
+  def fork!(options = nil)
+    Resque::Forker.new(options).run
   end
 end

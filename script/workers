@@ -9,10 +9,13 @@ Resque.setup do |forker|
     forker.logger = Rails.logger
     forker.workload = ["*"] * 4        # 4 workers on all queues
     forker.user "www-data", "www-data" # don't run as root
+    forker.interval = 1
+  else
+    forker.verbose = true
   end
 end
 # Stuff to do after forking a worker.
-Resque.after_fork do
+Resque.before_first_fork do
   ActiveRecord::Base.establish_connection
 end
 Resque.fork!

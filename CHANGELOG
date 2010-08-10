@@ -1,2 +1,10 @@
-2010-07-30
-	Extracted from Flowtown with permission
+2010-08-10 v1.1 Accessible options.
+
+Allows accessing options from forker.
+Allows setting :verbose and :very_verbose options instead of being magically inferred.
+Allows passing workload to fork! method as an option.
+
+2010-08-03 v1.0 First release
+
+2010-07-30 v1.0.beta
+Extracted from Flowtown with permission
