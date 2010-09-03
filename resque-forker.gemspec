@@ -1,13 +1,13 @@
 Gem::Specification.new do |spec|
   spec.name           = "resque-forker"
-  spec.version        = "1.1.0"
+  spec.version        = "1.2.0"
   spec.author         = "Assaf Arkin"
   spec.email          = "assaf@labnotes.org"
   spec.homepage       = "http://github.com/flowtown/resque-forker"
   spec.summary        = "Super awesome forking action for Resque workers"
   spec.post_install_message = ""
 
-  spec.files          = Dir["{lib,script}/**/*", "CHANGELOG", "MIT-LICENSE", "README.rdoc", "Rakefile", "resque-forker.gemspec"]
+  spec.files          = Dir["{lib,script}/**/*", "CHANGELOG", "MIT-LICENSE", "README.rdoc", "Rakefile", "*.gemspec"]
 
   spec.has_rdoc         = true
   spec.extra_rdoc_files = "README.rdoc", "CHANGELOG"

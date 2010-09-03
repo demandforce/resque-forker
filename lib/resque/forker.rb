@@ -10,7 +10,8 @@ module Resque
   #
   # To use this library, wrap your setup and teardown blocks: 
   #   Resque.setup do |forker|
-  #     require File.dirname(__FILE__) + "/../config/environment"
+  #     $:.unshift File.dirname(__FILE__) + "/.."
+  #     require "config/environment"
   #     ActiveRecord::Base.connection.disconnect!
   #     forker.logger = Rails.logger
   #     forker.user "nobody", "nobody"

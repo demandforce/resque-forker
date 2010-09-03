@@ -1,4 +1,4 @@
-spec = Gem::Specification.load(File.expand_path("resque-forker.gemspec", File.dirname(__FILE__)))
+spec = Gem::Specification.load(Dir["*.gemspec"].first)
 
 desc "Build the Gem"
 task :build do

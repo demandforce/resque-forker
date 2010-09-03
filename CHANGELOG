@@ -1,8 +1,18 @@
-2010-08-10 v1.1 Accessible options.
+2010-09-03 v1.2
+
+Added script/trigger to queue jobs from the command line (but more likely
+cronjob or upstart).
+
+Improved script/worker and /etc/init/workers based on real life experiences.
+And real life production deploys, let me tell you, can be a PITA.
+
+
+2010-08-11 v1.1 Accessible options.
 
 Allows accessing options from forker.
 Allows setting verbose and very_verbose options instead of being magically inferred.
 Allows passing workload to fork! method as an option.
+
 
 2010-08-03 v1.0 First release
 

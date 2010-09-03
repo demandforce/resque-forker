@@ -1,15 +1,21 @@
-#!/usr/bin/env ruby
+#!ruby
+# Go here to start from app's root directory.
+Dir.chdir File.expand_path(File.dirname(__FILE__) + "/..")
+# If using Bundler, you might need to uncomment next two lines
+#require "bundler"
+#Bundler.setup
 require "resque/forker"
 
 # Load the application.
 Resque.setup do |forker|
-  require File.dirname(__FILE__) + "/../config/environment"
+  $:.unshift Dir.pwd # Makes 1.9.2 happy
+  require "config/environment"
   ActiveRecord::Base.connection.disconnect!
+  forker.options.interval = 1
   if Rails.env.production?
     forker.logger = Rails.logger
     forker.workload = ["*"] * 4        # 4 workers on all queues
     forker.user "www-data", "www-data" # don't run as root
-    forker.options.interval = 1
   else
     forker.options.verbose = true
   end

@@ -24,17 +24,21 @@ queues) to process.
 Edit this to your needs and place it in script/workers:
 
   #!/usr/bin/env ruby
+  # If using Bundler, you might need to uncomment next two lines
+  #require "bundler"
+  #Bundler.setup
   require "resque/forker"
 
   # Load the application.
   Resque.setup do |forker|
-    require File.dirname(__FILE__) + "/../config/environment"
+    $:.unshift File.dirname(__FILE__) + "/.." # Makes 1.9.2 happy
+    require "config/environment"
     ActiveRecord::Base.connection.disconnect!
+    forker.options.interval = 1
     if Rails.env.production?
       forker.logger = Rails.logger
       forker.workload = ["*"] * 4        # 4 workers on all queues
       forker.user "www-data", "www-data" # don't run as root
-      forker.options.interval = 1
     else
       forker.options.verbose = true
     end
@@ -99,9 +103,11 @@ Edit this to your needs and place it in /etc/init/workers:
 
   start on runlevel [2345]
   stop on runlevel [06]
+
   chdir /var/www/myapp/current
   env RAILS_ENV=production
   exec script/workers
+
   respawn
 
 After reading this, Upstart to make sure your workers are always up and running.
@@ -142,9 +148,17 @@ If you're using Bundler, you might need to run the script using:
 
   exec bundle exec script/workers
 
-If you're using RVM and Bundler, you might need to create a wrapper and use it:
+If you're using RVM and have a system-wide install, you'll want to create a
+wrapper first, for example:
 
-  exec run_bundle script/workers
+  $ rvm wrapper 1.9.2 app ruby
+
+Then run the script using the wrapper:
+
+  exec app_ruby script/workers
+
+If you're using RVM and Bundler, don't forget to uncomment the relevant lines in
+script/workers.
 
 The point is, when the script starts it will expect both resque and
 resque-forker must be available for loading (that typically means GEMPATH).

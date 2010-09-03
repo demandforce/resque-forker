@@ -1,0 +1,11 @@
+#!ruby
+# Run like this:
+# run /var/app/current/script/trigger <queue> <ClassName> <arg1> ...
+
+# Go here to start from app's root directory.
+Dir.chdir File.expand_path(File.dirname(__FILE__) + "/..")
+# If using Bundler, you might need to uncomment next two lines
+#require "bundler"
+#Bundler.setup
+require "resque"
+Resque::Job.create *ARGV
