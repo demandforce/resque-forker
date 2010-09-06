@@ -1,4 +1,13 @@
-2010-09-03 v1.2
+2010-09-03 v1.2 Capistrano task and script/trigger
+
+Added Capistrano tasks for pausing, resuming, reloading and listing worker
+processes. To use, add this at the top of your Capfile:
+
+  require "resque/capistrano"
+
+And associate your worker instances with the role :worker. The workers will be
+reloaded after deploy:restart, suspended before deploy:web:disable and resumed
+after deploy:web:enable.
 
 Added script/trigger to queue jobs from the command line (but more likely
 cronjob or upstart).
@@ -15,6 +24,7 @@ Allows passing workload to fork! method as an option.
 
 
 2010-08-03 v1.0 First release
+
 
 2010-07-30 v1.0.beta
 Extracted from Flowtown with permission
