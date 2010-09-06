@@ -1,4 +1,4 @@
-2010-09-03 v1.2 Capistrano task and script/trigger
+2010-09-06 v1.2 Capistrano task and script/trigger
 
 Added Capistrano tasks for pausing, resuming, reloading and listing worker
 processes. To use, add this at the top of your Capfile:

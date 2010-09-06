@@ -1,6 +1,7 @@
 = Resque::Forker
 
-Super awesome forking action for Resque workers.
+Super awesome forking action for {Resque}[http://github.com/defunkt/resque]
+workers.
 
 == Forking Workers
 
@@ -96,8 +97,8 @@ them. Read on how to use Resque::Forker with Upstart.
 
 == Using Upstart
 
-If you're running a recent release of Ubuntu, you can get Upstart to manage your
-workers.
+If you're running a recent release of Ubuntu, you can get
+{Upstart}[http://upstart.ubuntu.com/] to manage your workers.
 
 Edit this to your needs and place it in /etc/init/workers:
 
@@ -130,8 +131,9 @@ Resque::Forker reloads itself (and the application) while keeping the same PID.
 
 == Using Capistrano
 
-Make sure to require "resque/capistrano" at the top of your Capfile and
-associate worker instances with the roles :worker.
+Make sure to require "resque/capistrano" at the top of your
+{Capfile}[http://www.capify.org/] and associate worker instances with the roles
+:worker.
 
 You now have four new task:
 * workers:pid -- Lists PID and additional information for all worker processes.
@@ -146,12 +148,15 @@ deploy:web:disable, and workers:resume after deploy:web:enable.
 
 == Troubleshooting
  
-If you're using Bundler, you might need to run the script using: 
+If you're using {Bundler}[http://gembundler.com/], you might need to run the
+script {like this}[http://gembundler.com/man/bundle-exec.1.html]: 
 
   exec bundle exec script/workers
 
-If you're using RVM and have a system-wide install, you'll want to create a
-wrapper first, for example:
+If you're using {RVM}[http://rvm.beginrescueend.com/] and have a system-wide
+install, you'll want to {create a
+wrapper}[http://rvm.beginrescueend.com/deployment/best-practices/], for
+example:
 
   $ rvm wrapper 1.9.2 app ruby
 
@@ -179,4 +184,4 @@ that doesn't have your regular account settings:
 
 == Credits
 
-Copyright (c) 2010 Flowtown, Inc.
+Copyright (c) 2010 {Flowtow, Inc}[http://flowtown.com].

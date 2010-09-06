@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    resque-forker (1.1.0)
+    resque-forker (1.2.0)
       resque
 
 GEM
@@ -9,6 +9,7 @@ GEM
   specs:
     json_pure (1.4.3)
     rack (1.2.1)
+    rake (0.8.7)
     redis (2.0.5)
     redis-namespace (0.8.0)
       redis (< 3.0.0)
@@ -21,10 +22,13 @@ GEM
       rack (>= 1.0)
     vegas (0.1.7)
       rack (>= 1.0.0)
+    yard (0.6.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  rake
   resque
   resque-forker!
+  yard

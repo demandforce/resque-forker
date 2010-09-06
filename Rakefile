@@ -1,3 +1,5 @@
+require "yard"
+
 spec = Gem::Specification.load(Dir["*.gemspec"].first)
 
 desc "Build the Gem"
@@ -19,4 +21,8 @@ task :push=>["build"] do
   sh "git push --tag"
   puts "Building and pushing gem .."
   sh "gem push #{spec.name}-#{spec.version}.gem"
+end
+
+YARD::Rake::YardocTask.new do |doc|
+  doc.files = FileList["lib/**/*.rb"]
 end
