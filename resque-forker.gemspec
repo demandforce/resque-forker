@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name           = "resque-forker"
-  spec.version        = "1.2.0"
+  spec.version        = "1.2.1"
   spec.author         = "Assaf Arkin"
   spec.email          = "assaf@labnotes.org"
   spec.homepage       = "http://github.com/flowtown/resque-forker"

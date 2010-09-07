@@ -1,3 +1,5 @@
+2010-09-07 v1.2 Capistrano role is worker, not workers
+
 2010-09-06 v1.2 Capistrano task and script/trigger
 
 Added Capistrano tasks for pausing, resuming, reloading and listing worker
