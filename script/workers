@@ -25,3 +25,4 @@ Resque.before_first_fork do
   ActiveRecord::Base.establish_connection
 end
 Resque.fork!
+puts "here"

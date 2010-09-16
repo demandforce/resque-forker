@@ -1,4 +1,16 @@
-2010-09-07 v1.2 Capistrano role is worker, not workers
+2010-09-16 v1.3 Show command in Resque console, USR1 dumps to syslog
+
+Resque console now shows forker script command (look for 'script'). This will
+help you determine which version is running, e.g.  .../current/script/worker is
+latest, whereas .../releases/20100916/script/worker will get stuck on this
+release when you reload.
+
+Experimental: send USR1 single to have Resque::Forker dump Resque statistics,
+queue and worker lists to Syslog. You can then enjoy the glory of checking
+status from the command line:
+
+  kill -USR1 <pid>
+	tail /var/log/syslog.log
 
 2010-09-06 v1.2 Capistrano task and script/trigger
 

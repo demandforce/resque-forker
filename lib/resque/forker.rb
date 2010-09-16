@@ -1,5 +1,6 @@
 require "logger"
 require "resque"
+require "syslog"
 
 module Resque
   # Loading Rails, the application and all its dependencies takes significant time
@@ -61,6 +62,8 @@ module Resque
   #   exec script/workers
   #   respawn
   class Forker
+
+    VERSION = "1.3.0"
 
     Options = Struct.new(:verbose, :very_verbose, :interval, :terminate)
 
@@ -133,7 +136,7 @@ module Resque
         exit
       end
       # Pause/continue processing
-      trap(:USR1) { Process.kill :USR1, *@children }
+      trap(:USR1) { dump }
       trap(:USR2) { Process.kill :USR2, *@children }
       trap(:CONT) { Process.kill :CONT, *@children }
       # Reincarnate. Stop children, and reload binary (application and all)
@@ -203,6 +206,25 @@ module Resque
       exit!
     end
 
+    def dump
+      Syslog.open "resque-forker" unless Syslog.opened?
+      Syslog.notice "STATUS:"
+      for key, value in Resque.info.to_a.sort_by { |i| i[0].to_s }
+        Syslog.notice "%20s: %s" % [key, value]
+      end
+      Syslog.notice "QUEUES:"
+      for queue in Resque.queues.sort_by { |q| q.to_s }
+        Syslog.notice "%20s: %d" % [queue, Resque.size(queue)]
+      end
+      Syslog.notice "WORKERS:"
+      for worker in (workers = Resque.workers.sort_by { |w| w.to_s })
+        Syslog.notice "%40s: %s" % [worker, worker.state]
+      end
+      Syslog.notice "There are no registered workers" if workers.empty?
+    rescue
+      Syslog.err $!
+    end
+
   end
 
   
@@ -242,4 +264,13 @@ module Resque
   def fork!(options = nil)
     Resque::Forker.new(options).run
   end
+
+  # Have Resque console show the command/arguments.
+  alias :info_without_forker :info
+  def info
+    hash = info_without_forker
+    hash[:script] = ([$0] + ARGV).map { |a| a[/[\s"]/] ? a.inspect : a }.join(" ")
+    hash
+  end
+  
 end

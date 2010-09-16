@@ -26,3 +26,7 @@ end
 YARD::Rake::YardocTask.new do |doc|
   doc.files = FileList["lib/**/*.rb"]
 end
+
+task :clobber do
+  rm_rf %w{doc .yardoc}
+end

@@ -79,7 +79,7 @@ master process, which will propagate them to all workers:
 
   kill -QUIT -- Quit gracefully
   kill -TERM -- Terminate immediately
-  kill -USR1 -- Stop any ongoing job
+  kill -USR1 -- Dump status to syslog
   kill -USR2 -- Suspend worker
   kill -CONT -- Resume suspended worker
 
@@ -180,6 +180,15 @@ What you can do to troubleshoot this situation is run as root in a new shell
 that doesn't have your regular account settings:
 
   $ env -i sudo /bin/bash --norc --noprofile
+
+Also, make sure your script is running from the current directory. Say the
+script path as shown in the Resque console is
+/var/www/myapp/current/script/worker: reloading this script will load the most
+recent version of your application.
+
+On the other hand, if the script path looks like
+/var/www/myapp/releases/20100916, reloading this script will reload the same
+release over and over.
 
 
 == Credits
