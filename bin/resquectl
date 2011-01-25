@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+# -*- encoding: binary -*-
+
+ENV["RACK_ENV"] ||= "development"
+require 'optparse'
+require "resque/forker"
+require "resque/master"
+
+options = Resque::Master.optparse!
+options = Resque::Master.process(options[:config]).merge(options) if options[:config]
+options = Resque::Master.defaults.merge(options)
+
+Resque::Master.setup(options)
+
+if options[:daemon]
+  STDERR.puts "[Warning]: running without dropping a pid file #{Process.pid}" if options[:pidfile].nil?
+  STDERR.puts "[Warning]: running daemon in #{options[:runpath]}" if options[:runpath] == '/'
+
+  Resque::Master.daemonize(options)
+else
+  Resque.fork!
+end
