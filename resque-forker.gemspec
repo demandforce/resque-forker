@@ -10,8 +10,9 @@ Gem::Specification.new do |spec|
   spec.summary        = "Super awesome forking action for Resque workers"
   spec.description    = "Use the power of forking to run multiple Resque workers."
   spec.post_install_message = ""
+  spec.executables    = %w(resquectl)
 
-  spec.files          = Dir["{lib,script,etc}/**/*", "CHANGELOG", "MIT-LICENSE", "README.rdoc", "Rakefile", "*.gemspec"]
+  spec.files          = Dir["{lib,script,etc,bin}/**/*", "CHANGELOG", "MIT-LICENSE", "README.rdoc", "Rakefile", "*.gemspec"]
 
   spec.has_rdoc         = true
   spec.extra_rdoc_files = "README.rdoc", "CHANGELOG"
