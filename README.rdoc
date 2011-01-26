@@ -16,7 +16,7 @@ application once and then forking it. Forking all these workers takes
 milliseconds. Faster restart means faster deploy and less downtime. Yay!
 
 
-== Configuring your Workers to use resquectl
+== Configuring your Workers to use resque-ctl
 
 Create a Ruby script that loads the applications, handles
 connections, and decides what kind of workload (how many workers on which
