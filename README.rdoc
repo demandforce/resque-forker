@@ -16,7 +16,57 @@ application once and then forking it. Forking all these workers takes
 milliseconds. Faster restart means faster deploy and less downtime. Yay!
 
 
-== Creating the script
+== Configuring your Workers to use resquectl
+
+Create a Ruby script that loads the applications, handles
+connections, and decides what kind of workload (how many workers on which
+queues) to process.
+
+Edit this to your needs and place it in config/resque_workers.rb:
+
+  worker_processes 1 # number of worker processes to spawn
+  worker_queues ["*"] # listen on all worker queues
+  worker_timeout 30 # timeout a worker
+  work_interval 3 # intervals to poll
+
+  working_directory "/app/path"  # where to run daemonized workers
+  pid "/app/path/tmp/pids/workers.pid" # master process pid
+  stderr_path "/app/path/log/workers.stderr.log"
+  stdout_path "/app/path/log/workers.stdout.log"
+  preload_app true
+  daemonize true
+
+  GC.respond_to?(:copy_on_write_friendly=) and GC.copy_on_write_friendly = true
+
+  setup do|forker|
+    defined?(ActiveRecord::Base) and ActiveRecord::Base.connection.disconnect!
+
+    if Rails.env.development?
+      forker.options.verbose = true
+    else
+      forker.logger   = Rails.logger
+    end
+
+  end
+
+  # run in master
+  before_fork do
+    defined?(ActiveRecord::Base) and ActiveRecord::Base.connection.disconnect!
+    Resque.redis.quit
+  end
+
+  # run in worker
+  after_fork do
+    ActiveRecord::Base.establish_connection
+  end
+
+The configuration should seem very similar to how unicorn sets up it's configuration.
+
+You can now run workers from the command line:
+
+  $ resquectl -c config/resque_workers.rb
+
+== Using a script/workers control file
 
 We're going to create a Ruby script that loads the applications, handles
 connections, and decides what kind of workload (how many workers on which
@@ -25,21 +75,18 @@ queues) to process.
 Edit this to your needs and place it in script/workers:
 
   #!/usr/bin/env ruby
-  # If using Bundler, you might need to uncomment next two lines
-  #require "bundler"
-  #Bundler.setup
   require "resque/forker"
 
   # Load the application.
   Resque.setup do |forker|
     $:.unshift File.dirname(__FILE__) + "/.." # Makes 1.9.2 happy
-    require "config/environment"
+    require File.dirname(__FILE__) + "/../config/environment"
     ActiveRecord::Base.connection.disconnect!
-    forker.options.interval = 1
     if Rails.env.production?
       forker.logger = Rails.logger
       forker.workload = ["*"] * 4        # 4 workers on all queues
       forker.user "www-data", "www-data" # don't run as root
+      forker.options.interval = 1
     else
       forker.options.verbose = true
     end
