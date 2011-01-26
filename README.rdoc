@@ -52,12 +52,11 @@ Edit this to your needs and place it in config/resque_workers.rb:
   # run in master
   before_fork do
     defined?(ActiveRecord::Base) and ActiveRecord::Base.connection.disconnect!
-    Resque.redis.quit
   end
 
   # run in worker
   after_fork do
-    ActiveRecord::Base.establish_connection
+    defined?(ActiveRecord::Base) and ActiveRecord::Base.establish_connection
   end
 
 The configuration should seem very similar to how unicorn sets up it's configuration.
