@@ -83,7 +83,8 @@ module Resque
       Resque.setup do |forker|
         puts "calling resque setup: #{options.inspect}"
         if options[:preload_app]
-          require File.dirname(__FILE__) + "/../config/environment"
+          $:.unshift options[:runpath] # Makes 1.9.2 happy
+          require options[:runpath] + "/config/environment"
           forker.logger   = Rails.logger
         end
 
