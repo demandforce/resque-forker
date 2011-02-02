@@ -63,7 +63,11 @@ The configuration should seem very similar to how unicorn sets up it's configura
 
 You can now run workers from the command line:
 
-  $ resquectl -c config/resque_workers.rb
+  $ resque-ctl -c config/resque_workers.rb
+
+or with bundler
+
+  $ bundle exec resque-ctl -c config/resque_workers.rb
 
 == Using a script/workers control file
 
