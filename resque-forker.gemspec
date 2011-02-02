@@ -1,5 +1,5 @@
-$: << File.dirname(__FILE__) + "/lib"
-require "resque/forker"
+$:.unshift File.expand_path(File.dirname(__FILE__) + "/lib")
+require "resque/forker/version"
 
 Gem::Specification.new do |spec|
   spec.name           = "resque-forker"

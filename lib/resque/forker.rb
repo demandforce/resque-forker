@@ -1,6 +1,7 @@
 require "logger"
 require "resque"
 require "syslog"
+require 'resque/forker/version'
 
 module Resque
   # Loading Rails, the application and all its dependencies takes significant time
@@ -62,8 +63,6 @@ module Resque
   #   exec script/workers
   #   respawn
   class Forker
-
-    VERSION = "1.3.0"
 
     Options = Struct.new(:verbose, :very_verbose, :interval, :terminate)
 
