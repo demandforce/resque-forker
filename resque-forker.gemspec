@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.summary        = "Super awesome forking action for Resque workers"
   spec.description    = "Use the power of forking to run multiple Resque workers."
   spec.post_install_message = ""
-  spec.executables    = %w(bin/resque-ctl)
+  spec.executables    = %w(resque-ctl)
 
   spec.files          = Dir["{lib,script,etc,bin}/**/*", "CHANGELOG", "MIT-LICENSE", "README.rdoc", "Rakefile", "*.gemspec"]
 
