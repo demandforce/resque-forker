@@ -78,14 +78,21 @@ module Resque
     end
 
     def self.setup(options)
-      puts "running setup with: #{options.inspect}"
+      options[:runpath] = Dir.pwd if options[:runpath].nil?
 
       Resque.setup do |forker|
-        puts "calling resque setup: #{options.inspect}"
+        puts "calling Resque setup: #{options.inspect}"
         if options[:preload_app]
-          $:.unshift options[:runpath] # Makes 1.9.2 happy
-          require options[:runpath] + "/config/environment"
-          forker.logger   = Rails.logger
+          begin
+            $:.unshift options[:runpath] # Makes 1.9.2 happy
+            require options[:runpath] + "/config/environment"
+            puts "Loaded Rails: #{Rails.env}"
+            forker.logger   = Rails.logger
+          rescue => e
+            STDERR.puts e.message
+            STDERR.puts e.backtrace.join("\n")
+            raise e
+          end
         end
 
         File.open(options[:pidfile],"wb") {|f| f << Process.pid } if options[:pidfile]
@@ -213,7 +220,6 @@ module Resque
         :logfile => nil,
         :stderr_path => "/dev/null",
         :stdout_path => "/dev/null",
-        :runpath => "/",
         :pidfile => nil,
         :daemon => false,
         :preload_app => true,
