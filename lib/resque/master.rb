@@ -81,7 +81,6 @@ module Resque
       options[:runpath] = Dir.pwd if options[:runpath].nil?
 
       Resque.setup do |forker|
-        puts "calling Resque setup: #{options.inspect}"
         if options[:preload_app]
           begin
             $:.unshift options[:runpath] # Makes 1.9.2 happy
@@ -96,7 +95,6 @@ module Resque
         end
 
         File.open(options[:pidfile],"wb") {|f| f << Process.pid } if options[:pidfile]
-        puts options.inspect
         forker.workload = options[:worker_queues] * options[:worker_processes].to_i if options[:worker_queues] && options[:worker_processes]
         forker.options.interval = options[:work_interval].to_i if options.key?(:work_interval)
       end
