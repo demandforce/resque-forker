@@ -64,7 +64,7 @@ module Resque
 
     def initialize(path)
       @config_path = path
-      @options = {}
+      @options = Master.defaults
     end
 
     def self.process(config_path)
@@ -88,13 +88,14 @@ module Resque
           forker.logger   = Rails.logger
         end
 
-        File.open(options[:pidfile],"wb") {|f| f << Process.pid }
-        forker.workload = options[:worker_queues] * options[:worker_processes].to_i
+        File.open(options[:pidfile],"wb") {|f| f << Process.pid } if options[:pidfile]
+        puts options.inspect
+        forker.workload = options[:worker_queues] * options[:worker_processes].to_i if options[:worker_queues] && options[:worker_processes]
         forker.options.interval = options[:work_interval].to_i if options.key?(:work_interval)
       end
 
       Resque.teardown do|forker|
-        File.unlink(options[:pidfile]) if File.exist?(options[:pidfile])
+        File.unlink(options[:pidfile]) if options[:pidfile] && File.exist?(options[:pidfile]) 
       end
 
       Resque.before_first_fork do
@@ -214,7 +215,11 @@ module Resque
         :stdout_path => "/dev/null",
         :runpath => "/",
         :pidfile => nil,
-        :daemon => false
+        :daemon => false,
+        :preload_app => true,
+        :worker_queues => ['*'],
+        :worker_processes => 1,
+        :work_interval => 5
       }
     end
 
