@@ -74,7 +74,9 @@ module Resque
     end
 
     def run
-      eval(File.read(@config_path), binding)
+      self.instance_eval(File.read(@config_path), @config_path, 0)
+    rescue => e
+      raise "Config error: '#{e.message}' at #{e.backtrace[0].gsub(/:in `run'/,'')}"
     end
 
     def self.setup(options)
