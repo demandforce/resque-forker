@@ -1,3 +1,18 @@
+2011-02-02 v2.0 Now, with resque-ctl
+
+You can now run workers from the command line
+
+  $ resque-ctl -c config/resque_workers.rb
+
+or with bundler
+
+  $ bundle exec resque-ctl -c config/resque_workers.rb
+
+Check the README for more details and how to configure.
+
+This awesome feature, brought to you by Todd Fisher (taf2).
+
+
 2010-09-16 v1.3 Show command in Resque console, USR1 dumps to syslog
 
 Resque console now shows forker script command (look for 'script'). This will
