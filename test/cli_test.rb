@@ -50,4 +50,20 @@ class CLITest < Test::Unit::TestCase
 
   end
 
+  def test_setup_with_options
+    config_path = "#{File.dirname(__FILE__)}/sample_test_config.rb"
+    base_path = File.expand_path(File.dirname(__FILE__))
+    options = {:config => config_path}
+    options = Resque::Master.process(options[:config]).merge(options)
+    options = Resque::Master.defaults.merge(options)
+
+    Resque::Master.setup(options)
+
+    # verify that setup assigned Proc's to before and after handlers
+    assert_nil Resque.before_first_fork
+    assert Resque.before_fork.is_a?(Proc)
+    assert Resque.after_fork.is_a?(Proc)
+
+  end
+
 end
