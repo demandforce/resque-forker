@@ -3,6 +3,9 @@ require "resque/forker"
 
 module Resque
 
+  # 
+  # Manages creating a master process and configuration for the child processes
+  #
   class Master
     attr_reader :options
 
@@ -87,12 +90,12 @@ module Resque
       options[:runpath] = Dir.pwd if options[:runpath].nil?
 
       Resque.setup do |forker|
-        if options[:preload_app]
+        if options[:preload_app] && defined?(Rails)
           begin
             $:.unshift options[:runpath] # Makes 1.9.2 happy
             require options[:runpath] + "/config/environment"
             puts "Loaded Rails: #{Rails.env}"
-            forker.logger   = Rails.logger
+            forker.logger   = Rails.logger unless options[:logfile]
           rescue => e
             STDERR.puts e.message
             STDERR.puts e.backtrace.join("\n")
@@ -109,17 +112,10 @@ module Resque
         File.unlink(options[:pidfile]) if options[:pidfile] && File.exist?(options[:pidfile]) 
       end
 
-      Resque.before_first_fork do
-        options[:before_first_fork].call if options[:before_first_fork].is_a?(Proc)
-      end
-
-      Resque.before_fork do
-        options[:before_fork].call if options[:before_fork].is_a?(Proc)
-      end
-
-      Resque.after_fork do
-        options[:after_fork].call if options[:after_fork].is_a?(Proc)
-      end
+      # register call backs
+      Resque.before_first_fork { options[:before_first_fork].call } if options[:before_first_fork].is_a?(Proc)
+      Resque.before_fork { options[:before_fork].call } if options[:before_fork].is_a?(Proc)
+      Resque.after_fork { options[:after_fork].call } if options[:after_fork].is_a?(Proc)
     end
 
     def self.daemonize(options)
