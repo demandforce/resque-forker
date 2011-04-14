@@ -38,6 +38,10 @@ module Resque
       @options[:stdout_path] = path
     end
 
+    def logfile(path)
+      @options[:logfile] = path
+    end
+
     def setup(&block)
       @options[:setup] = block
     end
