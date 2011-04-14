@@ -1,26 +1,28 @@
 PATH
   remote: .
   specs:
-    resque-forker (1.2.0)
+    resque-forker (2.0.0)
       resque
 
 GEM
   remote: http://rubygems.org/
   specs:
-    json_pure (1.4.3)
-    rack (1.2.1)
+    json (1.4.6)
+    rack (1.2.2)
     rake (0.8.7)
-    redis (2.0.5)
-    redis-namespace (0.8.0)
+    redis (2.2.0)
+    redis-namespace (0.10.0)
       redis (< 3.0.0)
-    resque (1.9.9)
-      json_pure (~> 1.4.0)
-      redis-namespace (~> 0.8.0)
+    resque (1.15.0)
+      json (~> 1.4.6)
+      redis-namespace (>= 0.10.0)
       sinatra (>= 0.9.2)
       vegas (~> 0.1.2)
-    sinatra (1.0)
-      rack (>= 1.0)
-    vegas (0.1.7)
+    sinatra (1.2.3)
+      rack (~> 1.1)
+      tilt (>= 1.2.2, < 2.0)
+    tilt (1.2.2)
+    vegas (0.1.8)
       rack (>= 1.0.0)
     yard (0.6.1)
 
@@ -29,6 +31,5 @@ PLATFORMS
 
 DEPENDENCIES
   rake
-  resque
   resque-forker!
   yard
