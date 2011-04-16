@@ -69,6 +69,10 @@ module Resque
       @options[:daemon] = yes_no
     end
 
+    def verbose(yes_no)
+      @options[:verbose] = yes_no
+    end
+
     def initialize(path)
       @config_path = path
       @options = Master.defaults
@@ -90,6 +94,7 @@ module Resque
       options[:runpath] = Dir.pwd if options[:runpath].nil?
 
       Resque.setup do |forker|
+        forker.options.verbose = options[:verbose] if options.key?(:verbose)
         if options[:preload_app] && defined?(Rails)
           begin
             $:.unshift options[:runpath] # Makes 1.9.2 happy
@@ -131,7 +136,7 @@ module Resque
         Process.setsid
         fork do
           begin
-            wr.write "Prepare to fork: #{options.inspect}, stdout: #{stdout.inspect}, stderr: #{stderr.inspect}, stdin: /dev/null"
+            wr.write "Prepare to fork: #{options.inspect}, stdout: #{stdout.inspect}, stderr: #{stderr.inspect}, stdin: /dev/null" if options[:verbose]
             Process.setsid
             Dir.chdir(options[:runpath])
             File.umask 0000

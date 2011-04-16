@@ -10,6 +10,7 @@ stdout_path "/var/www/apps/appname/shared/log/workers.stdout.log"
 logfile "/var/www/apps/appname/shared/log/workers.log"
 preload_app true
 daemonize true
+verbose true
 
 GC.respond_to?(:copy_on_write_friendly=) and GC.copy_on_write_friendly = true
 

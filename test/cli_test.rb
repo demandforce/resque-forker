@@ -64,6 +64,24 @@ class CLITest < Test::Unit::TestCase
     assert Resque.before_fork.is_a?(Proc)
     assert Resque.after_fork.is_a?(Proc)
 
+    Resque::Master.daemonize(options)
+
+    sleep 0.5
+
+    assert File.exist?(options[:pidfile])
+    assert File.exist?(options[:stderr_path])
+    assert File.exist?(options[:stdout_path])
+
+  ensure
+    Process.kill "QUIT", File.read(options[:pidfile]).to_i
+
+    sleep 0.5
+
+    assert File.read(options[:stderr_path]).match(/Quitting/), "Not message found"
+
+    File.unlink(options[:pidfile]) if File.exist?(options[:pidfile])
+    File.unlink(options[:stdout_path])
+    File.unlink(options[:stderr_path])
   end
 
 end
