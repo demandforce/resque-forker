@@ -14,7 +14,6 @@ Gem::Specification.new do |spec|
 
   spec.files          = Dir["{lib,script,etc,bin}/**/*", "CHANGELOG", "MIT-LICENSE", "README.rdoc", "Rakefile", "*.gemspec"]
 
-  spec.has_rdoc         = true
   spec.extra_rdoc_files = "README.rdoc", "CHANGELOG"
   spec.rdoc_options     = "--title", "Resque Forker  #{spec.version}", "--main", "README.rdoc", "--webcvs", spec.homepage
 

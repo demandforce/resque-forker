@@ -1,3 +1,4 @@
+require 'rake/testtask'
 require "yard"
 
 spec = Gem::Specification.load(Dir["*.gemspec"].first)
@@ -29,4 +30,14 @@ end
 
 task :clobber do
   rm_rf %w{doc .yardoc}
+end
+
+
+desc 'Default: run unit tests.'
+task :default => :test
+
+desc 'Test the assemblage plugin.'
+Rake::TestTask.new(:test) do |t|
+  t.libs << 'test'
+  t.pattern = 'test/**/*_test.rb'
 end
