@@ -82,8 +82,7 @@ Edit this to your needs and place it in script/workers:
 
   # Load the application.
   Resque.setup do |forker|
-    $:.unshift File.dirname(__FILE__) + "/.." # Makes 1.9.2 happy
-    require File.dirname(__FILE__) + "/../config/environment"
+    require File.expand_path('../../config/environment', __FILE__)
     ActiveRecord::Base.connection.disconnect!
     if Rails.env.production?
       forker.logger = Rails.logger
