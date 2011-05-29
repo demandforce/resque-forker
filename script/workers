@@ -8,8 +8,7 @@ require "resque/forker"
 
 # Load the application.
 Resque.setup do |forker|
-  $:.unshift Dir.pwd # Makes 1.9.2 happy
-  require "config/environment"
+  require File.expand_path('../../config/environment', __FILE__)
   ActiveRecord::Base.connection.disconnect!
   forker.options.interval = 1
   if Rails.env.production?
@@ -25,4 +24,3 @@ Resque.before_first_fork do
   ActiveRecord::Base.establish_connection
 end
 Resque.fork!
-puts "here"
