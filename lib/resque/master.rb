@@ -110,7 +110,7 @@ module Resque
 
         File.open(options[:pidfile],"wb") {|f| f << Process.pid } if options[:pidfile]
         forker.workload = options[:worker_queues] * options[:worker_processes].to_i if options[:worker_queues] && options[:worker_processes]
-        forker.options.interval = options[:work_interval].to_i if options.key?(:work_interval)
+        forker.options.interval = options[:work_interval].to_f if options.key?(:work_interval)
       end
 
       Resque.teardown do|forker|
